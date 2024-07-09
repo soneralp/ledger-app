@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Requests\AddBalanceRequest;
 use App\Http\Requests\CreateAccountRequest;
 use App\Models\Accounts;
 use App\Models\User;
+use App\Models\Transactions;
 
 class AccountController extends Controller
 {
@@ -33,22 +33,39 @@ class AccountController extends Controller
         ], 201);
     }
 
-    public function addBalance(AddBalanceRequest $request)
+    public function getBalanceAtDate(Request $request)
     {
-        $account = Accounts::findOrFail($request->account_id);
+        $validatedData = $request->validate([
+            'user_id' => 'required|integer',
+            'account_id' => 'required|integer',
+            'date' => 'required|date',
+        ]);
 
-        if ($account) {
-            $account->balance += $request->amount;
-            $account->save();
-        } else {
-            return response()->json([
-                'message' => 'Account couldn\'t found',
-            ], 404);
+        $userId = $validatedData['user_id'];
+        $accountId = $validatedData['account_id'];
+        $date = $validatedData['date'];
+
+        $account = Accounts::where('id', $accountId)
+                          ->where('user_id', $userId)
+                          ->firstOrFail();
+
+        $transactions = Transactions::where('account_id', $accountId)
+                                   ->whereDate('transaction_date', '<=', $date)
+                                   ->get();
+
+        $balance = $account->balance;
+
+        foreach ($transactions as $transaction) {
+            if ($transaction->is_income) {
+                $balance += $transaction->amount;
+            } else {
+                $balance -= $transaction->amount;
+            }
         }
 
         return response()->json([
-            'message' => 'Balance added successfully',
-            'account' => $account
+            'balance' => $balance,
+            'date' => $date,
         ], 200);
     }
 }
