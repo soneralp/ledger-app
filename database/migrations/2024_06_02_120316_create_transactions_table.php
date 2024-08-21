@@ -11,15 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('transactions', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('account_id')->constrained()->onDelete('cascade');
-            $table->string('transaction_type');
-            $table->decimal('amount', 10, 2);
-            $table->string('description')->nullable();
-            $table->date('transaction_date');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('transactions')) {
+            Schema::create('transactions', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('account_id')->constrained()->onDelete('cascade');
+                $table->string('transaction_type');
+                $table->decimal('amount', 10, 2);
+                $table->string('description')->nullable();
+                $table->date('transaction_date');
+                $table->boolean('is_income')->default(false);
+                $table->timestamps();
+            });
+        }
     }
 
     /**

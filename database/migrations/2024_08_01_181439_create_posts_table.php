@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('entries')) {
-            Schema::create('entries', function (Blueprint $table) {
+        if (!Schema::hasTable('posts')) {
+            Schema::create('posts', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('transaction_id')->constrained()->onDelete('cascade');
-                $table->foreignId('account_id')->constrained()->onDelete('cascade');
-                $table->decimal('amount', 10, 2);
-                $table->string('entry_type');
+                $table->string('title');
+                $table->text('content');
+                $table->foreignId('user_id')->constrained()->onDelete('cascade');
                 $table->timestamps();
             });
         }
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('entries');
+        Schema::dropIfExists('posts');
     }
 };
