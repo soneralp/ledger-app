@@ -10,7 +10,11 @@ class BalanceService
 {
     public function addBalance($accountId, $amount)
     {
-        $account = Accounts::findOrFail($accountId);
+        if (request()->user()->is_admin) {
+            $account = Accounts::findOrFail($accountId);
+        } else {
+            $account = request()->user()->accounts()->where('id', $accountId)->first();
+        }
 
         if ($account) {
             $account->balance += $amount;
@@ -22,7 +26,11 @@ class BalanceService
 
     public function withdraw($accountId, $amount)
     {
-        $account = Accounts::findOrFail($accountId);
+        if (request()->user()->is_admin) {
+            $account = Accounts::findOrFail($accountId);
+        } else {
+            $account = request()->user()->accounts()->where('id', $accountId)->first();
+        }
 
         if ($account->balance < $amount) {
             throw new \Exception('Insufficient balance.');

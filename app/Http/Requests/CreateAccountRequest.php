@@ -16,7 +16,6 @@ class CreateAccountRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'user_id' => 'required|exists:users,id',
             'account_name' => [
                 'required',
                 'string',

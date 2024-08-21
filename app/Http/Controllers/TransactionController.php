@@ -6,6 +6,7 @@ use App\Http\Requests\TransactionRequest;
 use App\Services\BalanceService;
 use App\Services\TransactionService;
 use App\Http\Requests\AddBalanceRequest;
+use App\Models\Accounts;
 
 class TransactionController extends Controller
 {
@@ -69,6 +70,18 @@ class TransactionController extends Controller
     public function withdrawCredit(AddBalanceRequest $request)
     {
         try {
+            if (request()->user()->is_admin) {
+                $account = Accounts::findOrFail($request->account_id);
+            } else {
+                $account = request()->user()->accounts()->where('id', $request->account_id)->first();
+            }
+
+            if (!$account) {
+                return response()->json([
+                    'message' => 'Account couldn\'t be found',
+                ], 404);
+            }
+
             $transaction = $this->balanceService->withdraw(
                 $request->account_id,
                 $request->amount,
