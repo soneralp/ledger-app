@@ -2,6 +2,10 @@
 
 This is a Laravel-based ledger application that allows users to register, create accounts, manage balances, and perform transactions. Below are the API endpoints currently available in the application.
 
+## Efficient Balance Retrieval
+
+Instead of calculating the balance directly from transactions, the balance should be stored in a separate table or field for each transaction. When a new transaction occurs, the balance is updated along with it. This allows for quick balance retrieval without the need to recalculate millions of transactions repeatedly.
+
 ## API Endpoints
 
 ### 1. User Registration
